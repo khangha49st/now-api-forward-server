@@ -1,5 +1,6 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const fs = require('fs');
 
 const app = express();
 const PORT = 3000;
@@ -24,6 +25,20 @@ const placeDetailsOptions = {
 const apiRawPlaceDetailsProxy = createProxyMiddleware(rawPlaceDetailsOptions);
 // Create the proxy middleware for (2)
 const apiPlaceDetailsProxy = createProxyMiddleware(placeDetailsOptions);
+
+
+// Route for the root path
+app.get('/', (req, res) => {
+  // Read the HTML file asynchronously
+  fs.readFile('welcome.html', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+    res.send(data);
+  });
+});
 
 // Mount the proxy middleware
 app.use('/raw-place-details', apiRawPlaceDetailsProxy);
