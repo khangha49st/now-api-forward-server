@@ -29,10 +29,13 @@ const apiPlaceDetailsProxy = createProxyMiddleware(placeDetailsOptions);
 
 // Route for the root path
 app.get('/', (req, res) => {
+  // Construct the absolute path to the HTML file
+  const filePath = path.join(__dirname, 'welcome.html');
+
   // Read the HTML file asynchronously
-  fs.readFile('welcome.html', 'utf8', (err, data) => {
+  fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
-      console.error(err);
+      console.error('Error reading welcome.html:', err);
       res.status(500).send('Internal Server Error');
       return;
     }
