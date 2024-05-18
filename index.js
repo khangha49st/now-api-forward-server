@@ -1,32 +1,34 @@
-const express = require("express");
+const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
 const app = express();
+const PORT = 3000;
 
-const port = 5000;
+// Configuration of the target server
+const API_RAW_PLACE_DETAILS_URL = "https://wanderlog.com/api/placesAPI/getPlaceDetails/v2";
+const API_PLACE_DETAILS_URL = "https://wanderlog.com/api/places/metadata";
 
-// Body parser
-app.use(express.urlencoded({ extended: false }));
+// 1. Proxy middleware option for 'Raw place details'
+const rawPlaceDetailsOptions = {
+  target: API_RAW_PLACE_DETAILS_URL, // target host
+  changeOrigin: true,      // needed for virtual hosted sites
+};
 
-// Home route
-app.get("/", (req, res) => {
-  res.send("Welcome to a basic express App");
-});
+// 2. Proxy middleware option for 'Place details'
+const placeDetailsOptions = {
+    target: API_PLACE_DETAILS_URL, // target host
+    changeOrigin: true,      // needed for virtual hosted sites
+  };
 
-// Mock API
-app.get("/users", (req, res) => {
-  res.json([
-    { name: "William", location: "Abu Dhabi" },
-    { name: "Chris", location: "Vegas" }
-  ]);
-});
+// Create the proxy middleware for (1)
+const apiRawPlaceDetailsProxy = createProxyMiddleware(rawPlaceDetailsOptions);
+// Create the proxy middleware for (2)
+const apiPlaceDetailsProxy = createProxyMiddleware(placeDetailsOptions);
 
-app.post("/user", (req, res) => {
-  const { name, location } = req.body;
+// Mount the proxy middleware
+app.use('/raw-place-details', apiRawPlaceDetailsProxy);
+app.use('/place-details', apiPlaceDetailsProxy);
 
-  res.send({ status: "User created", name, location });
-});
-
-// Listen on port 5000
-app.listen(port, () => {
-  console.log(`Server is booming on port 5000
-Visit http://localhost:5000`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
