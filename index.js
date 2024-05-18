@@ -18,20 +18,21 @@ const rawPlaceDetailsOptions = {
 
 // 2. Proxy middleware option for 'Place details'
 const placeDetailsOptions = {
-    target: API_PLACE_DETAILS_URL, // target host
-    changeOrigin: true,      // needed for virtual hosted sites
-  };
+  target: API_PLACE_DETAILS_URL, // target host
+  changeOrigin: true,      // needed for virtual hosted sites
+};
 
 // Create the proxy middleware for (1)
 const apiRawPlaceDetailsProxy = createProxyMiddleware(rawPlaceDetailsOptions);
 // Create the proxy middleware for (2)
 const apiPlaceDetailsProxy = createProxyMiddleware(placeDetailsOptions);
 
+app.use(express.static('public'));
 
 // Route for the root path
 app.get('/', (req, res) => {
   // Construct the absolute path to the HTML file
-  const filePath = path.join(__dirname, 'welcome.html');
+  const filePath = path.join(__dirname, 'public', 'index.html');
 
   // Read the HTML file asynchronously
   fs.readFile(filePath, 'utf8', (err, data) => {
